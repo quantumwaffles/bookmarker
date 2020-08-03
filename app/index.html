@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Bookmarker!</title>
+
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+
+  <style>
+    body {
+      color: white;
+    }
+  </style>
+
+  <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+</head>
+
+<body class="bg-dark">
+
+  <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
+    <!-- <p class="navbar-brand">Bookmarker</p> -->
+  <!-- </nav> -->
+
+  <div class="container">
+
+    <div class="row">&nbsp;</div>
+
+    <div id="search-bookmark-view" class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12">
+            <input id="search-input" type="search" class="form-control" placeholder="Search">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="add-bookmark-view" class="row" hidden>
+      <div class="col">
+        <label id='edit-bookmark-label'></label>
+        <div class="form-group">
+          <input id="url-input" type="text" class="form-control" placeholder="URL">
+        </div>
+        <div class="form-group">
+          <input id="name-input" type="text" class="form-control" placeholder="Name">
+        </div>
+        <div class="form-group">
+          <input id="tags-input" type="text" , class="form-control" placeholder="Tags">
+        </div>
+        <div class="form-group">
+          <textarea id="notes-input" rows="5" class="form-control" placeholder="Notes"></textarea>
+        </div>
+        <div class="btn-group float-right" role="group">
+          <button id="add-bookmark-button" type="button" class="btn btn-primary">Add</button>
+          <button id="cancel-bookmark-button" type="button" class="btn btn-secondary">Cancel</button>
+        </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- <hr> -->
+    <div class="row">&nbsp;</div>
+
+    <div class="row">
+      <div class="col-12">
+        <button id="show-add-bookmark-button" type="button" class="btn btn-primary float-right">&plus;</button>
+      </div>
+    </div>
+    <div id="bookmark-list-view" class="row">
+      <div class="col">
+        <div style="overflow-y: auto; height: 300px;">
+          <ul id="bookmark-list" class="list-group text-dark" style="height: 10px;;">
+            <!-- generated -->
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Confirm Delete Modal -->
+  <div class="modal fade text-dark" id="confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-delete-modaltTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirm-delete-modal-title">Confirm Delete</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Whoa, whoa, whoa. Are you sure you want to delete this bookmark?
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-delete-button"  type="button" class="btn btn-secondary" data-dismiss="modal">Nah, nevermind</button>
+          <button id="confirm-delete-button" type="button" class="btn btn-danger" data-dismiss="modal">Yeah, go for it!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script> window.jQuery = window.$ = require('jquery'); </script>
+  <script type="text/javascript" src="../node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+  <script type="text/javascript" src="js/controls.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+</body>
+
+</html>
