@@ -13,6 +13,9 @@
   "build": {
     "win": {
       "icon": "icon.png"
+    },
+    "mac": {
+      "icon": "icon.png"
     }
   },
   "devDependencies": {
