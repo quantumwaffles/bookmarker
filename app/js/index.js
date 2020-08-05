@@ -1,7 +1,9 @@
 const { shell, ipcRenderer, clipboard } = require('electron')
 const { v4: uuidv4 } = require('uuid')
+const _ = require('lodash')
 
 const Store = require('electron-store')
+const { htmlPrefilter } = require('jquery')
 const store = new Store()
 
 const trashIcon = `
@@ -38,9 +40,9 @@ addBookmarkButton.onclick = function () {
     const tags = tagsInput.value.trim().length > 0 ? tagsInput.value.split(/(?: *, *)+/).map((s) => s.trim()) : []
     const notes = notesInput.value
     const name = nameInput.value.trim()
-    
 
-    if(editBookmark) {
+
+    if (editBookmark) {
         const key = editBookmark.key
         removeBookmark(key)
         addBookmark({ key, name, url, tags, notes })
@@ -73,7 +75,7 @@ searchInput.onkeydown = function (e) {
 }
 
 confirmDeleteButton.onclick = function () {
-    if(deleteKey) {
+    if (deleteKey) {
         removeBookmark(deleteKey)
         deleteKey = null
     }
@@ -85,7 +87,7 @@ function handleOnInput(e) {
         closeAddView()
     }
 
-    if(e.code === "Enter") {
+    if (e.code === "Enter") {
         e.preventDefault()
         addBookmarkButton.click()
     }
@@ -94,18 +96,82 @@ function handleOnInput(e) {
 urlInput.onkeydown = handleOnInput
 nameInput.onkeydown = handleOnInput
 tagsInput.onkeydown = handleOnInput
-notesInput.onkeydown = handleOnInput
 
 function launch(bookmark) {
-    shell.openExternal(bookmark.url)
+    const query = searchInput.value.trim()
+    const terms = query.split(' ')
+    const actionTerms = terms.filter(t => t.includes(':'))
+    const urlSegments = _.zip(
+        bookmark.url.split(/\[\<[^\>]+\>[^\]]+\]/g),
+        bookmark.url.match(/\[\<[^\>]+\>[^\]]+\]/g)
+    ).flatMap(x => x)
+    .filter(x => x)
+    let context = {}
+
+    if (actionTerms.length) {
+        const tags = bookmark.tags
+        const actionTags = tags.filter(t => t.includes(':'))
+        if (actionTags.length) {     
+
+            for(let i in actionTerms) {
+                const term = actionTerms[i].split(':')[0].toUpperCase()
+                
+                for(let j in actionTags) {
+                    const tag = actionTags[j].split(':')[0].toUpperCase()
+
+                    if(term === tag) {
+                        const paramString = actionTerms[i].slice(actionTerms[i].indexOf(':')+1)
+                        let template = actionTags[j].slice(actionTags[j].indexOf(':'))
+
+                        if(template.startsWith(':~')) {
+                            // TODO regex
+                        } else {
+                            let delim = '/' // default delimeter
+                            const m = template.match(/^:(?<delim>.):.*/)
+                            if(m && m.groups.delim) {
+                                delim = m.groups.delim
+                                template = template.slice(3)
+                            } else {
+                                template = template.slice(1)
+                            }
+
+                            const params = paramString.split(delim)
+                            template.split(delim).forEach((t, i) => {
+                                if(params[i]) {
+                                    context[t] = params[i]
+                                }
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    let url = ''
+    urlSegments.forEach(s => {
+        const optMatch = s.match(/\[\<(?<param>[^\>]+)\>(?<segment>[^\]]+)\]/)
+        if(optMatch) {
+            const param = optMatch.groups.param
+            const segment = optMatch.groups.segment
+            const value = context[param]
+            if(value) {
+                url = url + segment.replace(`{{${param}}}`, value)
+            }
+        } else {
+            url = url + s
+        }
+    })
+
+    shell.openExternal(url)
 }
 
 function refreshSearchResults() {
     const query = searchInput.value.trim().toUpperCase()
-    const terms = query.split(' ')
+    const terms = query.split(' ').map((t) => t.split(':')[0])
     filteredBookmarks = bookmarks.filter((b) => {
         const name = b.name.trim().toUpperCase()
-        const tags = b.tags.map((t) => t.toUpperCase())
+        const tags = b.tags.map((t) => t.toUpperCase().split(':')[0])
         const notes = b.notes.toUpperCase()
 
         const isMatch = terms.every((t) => {
@@ -115,7 +181,7 @@ function refreshSearchResults() {
         return isMatch
     })
 
-    filteredTags = [... new Set(bookmarks .flatMap((b) => b.tags))]
+    filteredTags = [... new Set(bookmarks.flatMap((b) => b.tags))]
         .filter((t) => terms.some((term) => t.toUpperCase().includes(term)))
 
     refreshBookmarkList()
@@ -127,7 +193,7 @@ function showAddView() {
     searchView.hidden = true
     listView.hidden = true
 
-    if(editBookmark) {
+    if (editBookmark) {
         editBookmarklabel.innerText = "Edit Bookmark"
         addBookmarkButton.innerText = "Edit"
         urlInput.value = editBookmark.url
@@ -164,8 +230,8 @@ function addBookmark(bookmark) {
         nameA = a.name.toUpperCase()
         nameB = b.name.toUpperCase()
 
-        if(nameA < nameB) return -1
-        if(nameA > nameB) return 1
+        if (nameA < nameB) return -1
+        if (nameA > nameB) return 1
 
         return 0
     })
@@ -193,7 +259,7 @@ function refreshTagsList() {
     filteredTags.forEach((t) => {
         const pill = document.createElement("span")
         pill.classList = 'badge badge-pill badge-info'
-        pill.innerHTML = `${t}`
+        pill.innerText = `${t}`
 
         tagsList.appendChild(pill)
         tagsList.appendChild(document.createTextNode(' '))
@@ -226,7 +292,7 @@ function refreshBookmarkList() {
         nameRow.appendChild(editAnchor)
         const bName = document.createElement("b")
         bName.innerHTML = `&nbsp;${bookmark.name}`
-        nameRow.appendChild(bName )
+        nameRow.appendChild(bName)
 
         const urlRow = document.createElement("div")
         urlRow.classList = 'row'
@@ -246,14 +312,15 @@ function refreshBookmarkList() {
 
         const tagsRow = document.createElement("div")
         tagsRow.classList = 'row'
-        tagsRow.innerHTML = `
-                <div class="col-1">Tags</div>
-                <div class="col-11">
-                    ${bookmark.tags.map((tag, index) => {
-                        return ` <span class='badge badge-pill badge-info'> ${tag} </span> `
-                    }).join('')}
-                </div>
-            `
+        tagsRow.appendChild(htmlToElement('<div class="col-1">Tags</div>'))
+        const tagPillDiv = htmlToElement('<div class="col-11"></div>')
+        bookmark.tags.forEach((t) => {
+            tagPill = htmlToElement(`<span class="badge badge-pill badge-info"></span>`)
+            tagPill.innerText = t
+            tagPillDiv.appendChild(tagPill)
+            tagPillDiv.appendChild(document.createTextNode(' '))
+        })
+        tagsRow.appendChild(tagPillDiv)
 
         const notesRow = document.createElement("div")
         notesRow.classList = 'row'
@@ -261,7 +328,7 @@ function refreshBookmarkList() {
             <div class="col-1">Notes</div>
             <div class="col-11">${bookmark.notes}</div>
         `
-        
+
         const li = document.createElement("li")
         li.classList = 'list-group-item'
 
@@ -279,6 +346,17 @@ function refreshBookmarkList() {
     })
 }
 
+/**
+ * @param {String} HTML representing a single element
+ * @return {Element}
+ */
+function htmlToElement(html) {
+    var template = document.createElement('template');
+    html = html.trim(); // Never return a text node of whitespace as the result
+    template.innerHTML = html;
+    return template.content.firstChild;
+}
+
 function loadBookmarks() {
     bookmarks = store.get('bookmarks') || []
     filteredBookmarks = bookmarks
@@ -287,7 +365,7 @@ function loadBookmarks() {
     refreshTagsList()
 }
 
-function saveBookmarks () {
+function saveBookmarks() {
     store.set('bookmarks', bookmarks)
 }
 
