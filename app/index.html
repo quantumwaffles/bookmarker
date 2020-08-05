@@ -20,7 +20,7 @@
 <body class="bg-dark">
 
   <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
-    <!-- <p class="navbar-brand">Bookmarker</p> -->
+  <!-- <p class="navbar-brand">Bookmarker</p> -->
   <!-- </nav> -->
 
   <div class="container">
@@ -31,7 +31,7 @@
       <div class="col-12">
         <div class="row">
           <div class="col-12">
-            <input id="search-input" type="search" class="form-control" placeholder="Search">
+            <input id="search-input" type="search" class="form-control form-control-lg" placeholder="Search">
           </div>
         </div>
       </div>
@@ -60,20 +60,29 @@
       </div>
     </div>
 
-    <!-- <hr> -->
-    <div class="row">&nbsp;</div>
+    <hr>
+    <!-- <div class="row">&nbsp;</div> -->
 
-    <div class="row">
-      <div class="col-12">
-        <button id="show-add-bookmark-button" type="button" class="btn btn-primary float-right">&plus;</button>
-      </div>
-    </div>
     <div id="bookmark-list-view" class="row">
       <div class="col">
-        <div style="overflow-y: auto; height: 300px;">
-          <ul id="bookmark-list" class="list-group text-dark" style="height: 10px;;">
-            <!-- generated -->
-          </ul>
+        <div class="row">
+          <div class="col-12">
+            <button id="show-add-bookmark-button" type="button" class="btn btn-primary float-right" hidden>&plus;</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <p id='tags-list' style="overflow: auto;">tags</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div style="overflow-y: auto; height: 350px; border-radius: 0px;">
+              <ul id="bookmark-list" class="list-group text-dark">
+                <!-- generated -->
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -82,8 +91,8 @@
 
 
   <!-- Confirm Delete Modal -->
-  <div class="modal fade text-dark" id="confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-delete-modaltTitle"
-    aria-hidden="true">
+  <div class="modal fade text-dark" id="confirm-delete-modal" tabindex="-1" role="dialog"
+    aria-labelledby="confirm-delete-modaltTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -96,8 +105,10 @@
           Whoa, whoa, whoa. Are you sure you want to delete this bookmark?
         </div>
         <div class="modal-footer">
-          <button id="cancel-delete-button"  type="button" class="btn btn-secondary" data-dismiss="modal">Nah, nevermind</button>
-          <button id="confirm-delete-button" type="button" class="btn btn-danger" data-dismiss="modal">Yeah, go for it!</button>
+          <button id="cancel-delete-button" type="button" class="btn btn-secondary" data-dismiss="modal">Nah,
+            nevermind</button>
+          <button id="confirm-delete-button" type="button" class="btn btn-danger" data-dismiss="modal">Yeah, go for
+            it!</button>
         </div>
       </div>
     </div>

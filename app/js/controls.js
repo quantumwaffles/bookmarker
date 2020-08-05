@@ -21,5 +21,6 @@ const tagsInput = find("tags-input")
 const notesInput = find("notes-input")
 
 const bookmarkList = find("bookmark-list")
+const tagsList = find("tags-list")
 
 const editBookmarklabel = find("edit-bookmark-label")

@@ -6,10 +6,18 @@
   "author": "Michael Rex",
   "license": "MIT",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder",
+    "pack": "electron-builder --dir"
+  },
+  "build": {
+    "win": {
+      "icon": "icon.png"
+    }
   },
   "devDependencies": {
-    "electron": "^9.1.2"
+    "electron": "^9.1.2",
+    "electron-builder": "^22.8.0"
   },
   "dependencies": {
     "bootstrap": "^4.5.0",
