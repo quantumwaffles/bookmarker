@@ -100,12 +100,17 @@ tagsInput.onkeydown = handleOnInput
 function launch(bookmark) {
     const query = searchInput.value.trim()
     const terms = query.split(' ')
-    const actionTerms = terms.filter(t => t.includes(':'))
+    let actionTerms = [] // terms.filter(t => t.includes(':'))
+    if(query.match(/^\S+:/)) {
+        actionTerms = [query]
+    }
+
     const urlSegments = _.zip(
         bookmark.url.split(/\[\<[^\>]+\>[^\]]+\]/g),
         bookmark.url.match(/\[\<[^\>]+\>[^\]]+\]/g)
     ).flatMap(x => x)
     .filter(x => x)
+    
     let context = {}
 
     if (actionTerms.length) {
@@ -168,9 +173,19 @@ function launch(bookmark) {
 
 function refreshSearchResults() {
     const query = searchInput.value.trim().toUpperCase()
-    const terms = query.split(' ').map((t) => t.split(':')[0])
+    const rawTerms = query.split(' ')
+    const terms = rawTerms.map((t) => t.split(':')[0])
+
+    const isQueryAction = query.match(/^\S+:/)
+    if(isQueryAction) {
+        searchInput.classList.add('action-tag-hilite')
+    } else {
+        searchInput.classList.remove('action-tag-hilite')
+    }
+
     filteredBookmarks = bookmarks.filter((b) => {
         const name = b.name.trim().toUpperCase()
+        const rawTags = b.tags
         const tags = b.tags.map((t) => t.toUpperCase().split(':')[0])
         const notes = b.notes.toUpperCase()
 
@@ -178,7 +193,15 @@ function refreshSearchResults() {
             return name.includes(t) || tags.includes(t)
         })
 
-        return isMatch
+        const isAction = rawTerms.some((term) => {
+            return term.includes(':') 
+                && rawTags.filter(tag => tag.includes(':'))
+                        .map(tag => tag.split(':')[0])
+                        .some(tag => tag.toUpperCase() 
+                            === term.split(':')[0].toUpperCase())
+        })
+
+        return isQueryAction ? isAction : isMatch
     })
 
     filteredTags = [... new Set(bookmarks.flatMap((b) => b.tags))]

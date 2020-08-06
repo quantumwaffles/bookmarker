@@ -11,6 +11,15 @@
     body {
       color: white;
     }
+
+    #search-input {
+      border-radius: 20px;
+    }
+
+    .action-tag-hilite, .action-tag-hilite:focus {
+      border: 3px solid #17A2B8;
+    }
+
   </style>
 
   <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
@@ -31,7 +40,7 @@
       <div class="col-12">
         <div class="row">
           <div class="col-12">
-            <input id="search-input" type="search" class="form-control form-control-lg" placeholder="Search">
+            <input id="search-input" type="search" class="form-control form-control-lg"  placeholder="Search">
           </div>
         </div>
       </div>
@@ -67,7 +76,8 @@
       <div class="col">
         <div class="row">
           <div class="col-12">
-            <button id="show-add-bookmark-button" type="button" class="btn btn-primary float-right" hidden>&plus;</button>
+            <button id="show-add-bookmark-button" type="button" class="btn btn-primary float-right"
+              hidden>&plus;</button>
           </div>
         </div>
         <div class="row">
