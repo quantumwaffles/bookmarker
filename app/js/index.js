@@ -176,8 +176,8 @@ function refreshSearchResults() {
     const rawTerms = query.split(' ')
     const terms = rawTerms.map((t) => t.split(':')[0])
 
-    const isQueryAction = query.match(/^\S+:/)
-    if(isQueryAction) {
+    const isActionQuery = query.match(/^\S+:/)
+    if(isActionQuery) {
         searchInput.classList.add('action-tag-hilite')
     } else {
         searchInput.classList.remove('action-tag-hilite')
@@ -193,7 +193,7 @@ function refreshSearchResults() {
             return name.includes(t) || tags.includes(t)
         })
 
-        const isAction = rawTerms.some((term) => {
+        const matchesActionTag = rawTerms.some((term) => {
             return term.includes(':') 
                 && rawTags.filter(tag => tag.includes(':'))
                         .map(tag => tag.split(':')[0])
@@ -201,7 +201,7 @@ function refreshSearchResults() {
                             === term.split(':')[0].toUpperCase())
         })
 
-        return isQueryAction ? isAction : isMatch
+        return isActionQuery ? matchesActionTag : isMatch
     })
 
     filteredTags = [... new Set(bookmarks.flatMap((b) => b.tags))]
